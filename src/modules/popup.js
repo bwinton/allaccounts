@@ -292,6 +292,22 @@ function loadTab(newTab, browser, tldDoc, user) {
 
   if (newTab) {
     // TODO inherit default users
+    let chromeWin = UIUtils.getMostRecentWindow();
+    let tabs = UIUtils.getTabList(chromeWin);
+
+    for (let tab of tabs) {
+      let tabUser = WinMap.findUser(
+        tab.linkedBrowser.documentURI,
+        getCurrentTopInnerId(tab),
+        getTabIdFromBrowser(tab.linkedBrowser));
+
+      if (UserUtils.equalsUser(user, tabUser ? tabUser.user : null)) {
+        // We already have a tab for this user
+        UIUtils.setSelectedTab(chromeWin, tab);
+        return;
+      }
+    }
+
     openNewTab(browser.currentURI.spec, browser.ownerDocument.defaultView);
   } else {
     UserState.setTabDefaultFirstParty(tldDoc, getTabIdFromBrowser(browser), user);

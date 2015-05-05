@@ -53,6 +53,11 @@ var UIUtils = {
     return chromeWin.gBrowser.selectedTab; // <tab>
   },
 
+  setSelectedTab: function(chromeWin, tab) {
+    console.assert(this.isMainWindow(chromeWin), "Not a browser window", chromeWin);
+    return chromeWin.gBrowser.selectedTab = tab; // <tab>
+  },
+
 
   // browser.xul has browser elements all over the place
   isContentBrowser: function(browser) {
