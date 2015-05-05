@@ -132,8 +132,6 @@ function createBoxDom(container) {
   stat.setAttribute("hidden", "true");
   stat.setAttribute("id", "${BASE_DOM_ID}-icon-stat-icon");
 
-  // max-width
-  container3.style.maxWidth = "20ch"; // TODO util.getText("icon.user.maxWidth");
   label.setAttribute("crop", "end");
   label.setAttribute("flex", "1");
 }
