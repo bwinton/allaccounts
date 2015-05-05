@@ -661,9 +661,9 @@ var DebugWinMap = {
 
     for (var id in WinMap._outer) {
       intId = parseInt(id, 10);
-      var outerWin = WinMap.getOuterEntry(intId);
-      if (outerWin.parentOuter === WindowUtils.WINDOW_ID_NONE) {
-        this._debugOuter(intId, output, "", usedOuters, usedInners, outerWin);
+      var outer = WinMap.getOuterEntry(intId);
+      if (outer.parentOuter === WindowUtils.WINDOW_ID_NONE) {
+        this._debugOuter(intId, output, "", usedOuters, usedInners, outer);
       }
     }
 
@@ -768,9 +768,9 @@ var DebugWinMap = {
     usedOuters.push(intOuterId);
     for (var id in WinMap._outer) {
       var intId = parseInt(id, 10);
-      var outerWin = WinMap.getOuterEntry(intId);
-      if (outerWin.parentOuter === intOuterId) {
-        this._debugOuter(intId, output, padding + "        ", usedOuters, usedInners, outerWin);
+      var outer = WinMap.getOuterEntry(intId);
+      if (outer.parentOuter === intOuterId) {
+        this._debugOuter(intId, output, padding + "        ", usedOuters, usedInners, outer);
       }
     }
   }

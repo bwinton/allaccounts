@@ -218,8 +218,7 @@ function insertIcon(show, url, doc) {
     statIcon.removeChild(statIcon.firstChild);
   }
   if (show) {
-    var doc = statIcon.ownerDocument;
-    var img = statIcon.appendChild(doc.createElement("image"));
+    var img = statIcon.appendChild(statIcon.ownerDocument.createElement("image"));
     img.setAttribute("src", url);
     img.setAttribute("width", "16");
     img.setAttribute("height", "16");
