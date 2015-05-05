@@ -232,7 +232,8 @@ function onLoginMiddleClick(evt) {
 
 
 function onLoginCommand(evt){
-  loginCommandCore(evt.target, evt.ctrlKey);
+  // loginCommandCore(evt.target, evt.ctrlKey);
+  loginCommandCore(evt.target, true);
 }
 
 
