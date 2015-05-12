@@ -179,7 +179,7 @@ function setStyle(mode, containerStyle, iconStyle, labelStyle) {
 
 function updateIconCore(doc, container, topInnerId, tab) {
   if (m_welcomeMode) {
-    getIconLabel(doc).setAttribute("value", "${EXT_NAME}");
+    getIconLabel(doc).setAttribute("value", "");
     insertIcon(true, "${PATH_CONTENT}/favicon.ico", doc);
     return;
   }
