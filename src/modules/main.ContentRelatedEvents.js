@@ -141,8 +141,43 @@ var ContentRelatedEvents = {
   // pageshow event => call updateUIAsync for bfcache or non http/https protocols
   _onPageShow: function(evt) {
     try {
+      var ioService = Components.classes["@mozilla.org/network/io-service;1"]
+                      .getService(Components.interfaces.nsIIOService);
+
       var doc = evt.target; // pageshow handler
       var win = doc.defaultView;
+      let uri = doc.documentURI;
+      if (uri.spec) {
+        uri = uri.spec;
+      }
+      let firstSlash = uri.indexOf('/', 8);
+      if (firstSlash != -1) {
+        uri = uri.slice(0, firstSlash);
+      }
+
+      let hostname = uri;
+
+      try {
+        // Get Login Manager
+        let myLoginManager = Components.classes["@mozilla.org/login-manager;1"].
+          getService(Components.interfaces.nsILoginManager);
+
+        // Find users for the given parameters
+        let logins = myLoginManager.findLogins({}, hostname, "", null);
+        let baseTld = getTldFromUri(ioService.newURI(uri, null, null));
+
+        // Find user from returned array of nsILoginInfo objects
+        for (let i = 0; i < logins.length; i++) {
+          let loginTld = getTldFromUri(ioService.newURI(logins[i].hostname, null, null));
+          if (loginTld === baseTld) {
+            console.error("Found login for " + baseTld + " of " + logins[i].username);
+            // + ", " + logins[i].password);
+          }
+        }
+      } catch(ex) {
+        // This will only happen if there is no nsILoginManager component class
+        console.error(ex);
+      }
 
       if (isSupportedScheme(win.location.protocol)) {
         // BUG rightclick>show image ==> evt.persisted=false
