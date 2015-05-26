@@ -95,12 +95,14 @@ function populateNewAccount(docUser, menupopup) {
 
 
 function populateUsers(docUser, menupopup) {
+
   var users = LoginDB.getUsers(docUser.encodedDocTld);
   if (users.length === 0) {
     return;
   }
 
   var doc = menupopup.ownerDocument;
+  var shownUsers = new Set();
 
   for (var idx = users.length - 1; idx > -1; idx--) {
     var myUser = users[idx];
@@ -122,6 +124,7 @@ function populateUsers(docUser, menupopup) {
       delItem.setAttribute("cmd", "del user");
       delItem.setAttribute("login-user16", myUser.encodedName);
       delItem.setAttribute("login-tld", myUser.encodedTld);
+      shownUsers.add(myUser.plainName);
 
     } else {
       var usernameItem = menupopup.appendChild(doc.createElement("menuitem"));
@@ -133,6 +136,7 @@ function populateUsers(docUser, menupopup) {
       if (myUser.encodedTld !== docUser.encodedDocTld) {
         usernameItem.setAttribute("tooltiptext", myUser.plainTld);
       }
+      shownUsers.add(myUser.plainName);
     }
   }
 
@@ -140,6 +144,7 @@ function populateUsers(docUser, menupopup) {
   var ioService = Components.classes["@mozilla.org/network/io-service;1"]
                   .getService(Components.interfaces.nsIIOService);
   let baseTld = docUser.ownerTld;
+
 
   try {
     // Get Login Manager
@@ -153,24 +158,23 @@ function populateUsers(docUser, menupopup) {
     }
 
     // Find user from returned array of nsILoginInfo objects
-    console.error("BW0: " + baseTld + ".length=" + logins.length);
     for (let i = 0; i < logins.length; i++) {
-      let loginTld = getTldFromUri(ioService.newURI(logins[i].hostname, null, null));
-      console.error("Found login for " + baseTld + " of " + logins[i].username + " / " + docUser.user.plainName);
-      if (logins[i].username !== docUser.user.plainName) {
+      var newAccount = docUser.user.toNewAccount();
+
+      if (!shownUsers.has(logins[i].username)) {
         var usernameItem = menupopup.appendChild(doc.createElement("menuitem"));
         usernameItem.setAttribute("type", "radio");
-        usernameItem.setAttribute("label", "* " + logins[i].username + "@" + loginTld);
-        usernameItem.setAttribute("cmd", "switch user");
-        usernameItem.setAttribute("login-user16", null);
-        usernameItem.setAttribute("login-tld", loginTld);
+        usernameItem.setAttribute("label", "Add " + logins[i].username + "@" + baseTld);
+        usernameItem.setAttribute("cmd", "new account");
+        usernameItem.setAttribute("login-user16", docUser.user.toNewAccount().encodedName);
+        usernameItem.setAttribute("login-tld", docUser.user.toNewAccount().encodedTld);
+        shownUsers.add(logins[i].username);
       }
     }
   } catch(ex) {
     // This will only happen if there is no nsILoginManager component class
     console.error(ex);
   }
-
 
   menupopup.appendChild(doc.createElement("menuseparator"));
 }
