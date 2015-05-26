@@ -165,9 +165,10 @@ function populateUsers(docUser, menupopup) {
         var usernameItem = menupopup.appendChild(doc.createElement("menuitem"));
         usernameItem.setAttribute("type", "radio");
         usernameItem.setAttribute("label", "Add " + logins[i].username + "@" + baseTld);
-        usernameItem.setAttribute("cmd", "new account");
+        usernameItem.setAttribute("cmd", "existing account");
         usernameItem.setAttribute("login-user16", docUser.user.toNewAccount().encodedName);
         usernameItem.setAttribute("login-tld", docUser.user.toNewAccount().encodedTld);
+        usernameItem.setAttribute("existing-user", logins[i].username);
         shownUsers.add(logins[i].username);
       }
     }
@@ -256,6 +257,7 @@ function onLoginMiddleClick(evt) {
   switch (menuItem.getAttribute("cmd")) {
     case "switch user":
     case "new account":
+    case "existing account":
       break;
     default:
       return;
@@ -299,6 +301,12 @@ function loginCommandCore(menuItem, newTab) {
       loadTab(newTab, browser, topWin.eTld, userId);
       break;
 
+    case "existing account":
+      removeCookies(CookieUtils.getUserCookies(userId));
+      removeTldData_LS(topWin.eTld);
+      loadTab(newTab, browser, topWin.eTld, userId, menuItem.getAttribute("existing-user"));
+      break;
+
     case "del user":
       var users = LoginDB.getUsers(StringEncoding.encode(topWin.eTld));
       removeCookies(CookieUtils.getUserCookies(userId));
@@ -326,7 +334,7 @@ function loginCommandCore(menuItem, newTab) {
 }
 
 
-function loadTab(newTab, browser, tldDoc, user) {
+function loadTab(newTab, browser, tldDoc, user, existing) {
   // update global default for new tabs - current tabs will keep their internal defaults
   LoginDB.setDefaultUser(StringEncoding.encode(tldDoc), user); // BUG should youtube set google as well?
 
@@ -349,6 +357,10 @@ function loadTab(newTab, browser, tldDoc, user) {
     }
 
     openNewTab(browser.currentURI.spec, browser.ownerDocument.defaultView);
+    if (existing) {
+      let tab = UIUtils.getSelectedTab(chromeWin);
+      tab.setAttribute('multifox-existing-login', existing);
+    }
   } else {
     UserState.setTabDefaultFirstParty(tldDoc, getTabIdFromBrowser(browser), user);
     updateUIAsync(browser, true); // show new user now, don't wait for new dom // BUG it doesn't working

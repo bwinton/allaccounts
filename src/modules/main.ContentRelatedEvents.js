@@ -148,9 +148,9 @@ var ContentRelatedEvents = {
         // BUG rightclick>show image ==> evt.persisted=false
         // BUG google login persists: google => br.mozdev=>back=>fw
         var fromCache = evt.persisted;
+        var innerWin = WinMap.getInnerWindowFromObj(win);
         if (fromCache) {
           // http top doc from cache: update icon
-          var innerWin = WinMap.getInnerWindowFromObj(win);
           if (innerWin.isInsideTab) {
             if ("docUserObj" in innerWin) {
               var tabId = innerWin.topWindow.outerId;
@@ -159,6 +159,16 @@ var ContentRelatedEvents = {
             }
             updateUIAsync(UIUtils.getParentBrowser(win), innerWin.isTop);
           }
+        }
+        var tab = UIUtils.getLinkedTabFromBrowser(UIUtils.getParentBrowser(win));
+        let existing = tab.getAttribute('multifox-existing-login');
+        if (existing) {
+          var usernameField = findUserNameField(doc);
+          if (usernameField !== null) {
+            usernameField.value = existing;
+
+          }
+          // updateUIAsync(UIUtils.getParentBrowser(win), innerWin.isTop);
         }
 
       } else { // ftp:, about:, chrome: etc. request/response listener may not be called
