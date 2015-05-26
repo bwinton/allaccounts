@@ -65,10 +65,6 @@ var SubmitObserver = {
     var topWin = innerWin.topWindow;
     var currentDocUser = WinMap.findUser(innerWin.originalUri, topWin.innerId, topWin.outerId);
 
-    if (username.indexOf("@") === -1) {
-      username += "@" + innerWin.eTld;
-    }
-
     var userId = new UserId(StringEncoding.encode(username),
                             StringEncoding.encode(innerWin.eTld));
     var docUser = new DocumentUser(userId, innerWin.eTld, topWin.innerId, topWin.outerId);

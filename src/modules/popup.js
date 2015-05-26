@@ -110,7 +110,7 @@ function populateUsers(docUser, menupopup) {
       var userMenu = menupopup.appendChild(doc.createElement("menu"));
       userMenu.className = "menu-iconic";
       userMenu.setAttribute("image", "${PATH_CONTENT}/favicon.ico");
-      userMenu.setAttribute("label", myUser.plainName);
+      userMenu.setAttribute("label", myUser.displayName);
       if (myUser.encodedTld !== docUser.encodedDocTld) {
         userMenu.setAttribute("tooltiptext", myUser.plainTld);
       }
@@ -126,7 +126,7 @@ function populateUsers(docUser, menupopup) {
     } else {
       var usernameItem = menupopup.appendChild(doc.createElement("menuitem"));
       usernameItem.setAttribute("type", "radio");
-      usernameItem.setAttribute("label", myUser.plainName);
+      usernameItem.setAttribute("label", myUser.displayName);
       usernameItem.setAttribute("cmd", "switch user");
       usernameItem.setAttribute("login-user16", myUser.encodedName);
       usernameItem.setAttribute("login-tld", myUser.encodedTld);
@@ -196,7 +196,7 @@ function populate3rdPartyUsers(thirdParty, menupopup, addSeparator) {
 function insertItem(userPopup, myUser, tld) {
   var item = userPopup.ownerDocument.createElement("menuitem");
   userPopup.appendChild(item);
-  item.setAttribute("label", myUser.plainName);
+  item.setAttribute("label", myUser.displayName);
   item.setAttribute("type", "radio");
   item.setAttribute("cmd", "set 3rd-party");
   item.setAttribute("login-doc", tld);

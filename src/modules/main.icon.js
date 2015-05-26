@@ -190,7 +190,7 @@ function updateIconCore(doc, container, topInnerId, tab) {
     // tab has an user
     var u = tabDocData.docUserObj.user;
     username = u.isNewAccount ? util.getText("icon.add-account.label")
-                              : u.plainName;
+                              : u.displayName;
   } else {
     // 3rd-party users only
     username = "\u271a";

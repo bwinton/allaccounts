@@ -58,6 +58,15 @@ UserId.prototype = {
   },
 
 
+  get displayName() {
+    let username = StringEncoding.decode(this._encName);
+    if (username.indexOf("@") === -1) {
+      username += "@" + StringEncoding.decode(this._encTld);
+    }
+    return username;
+  },
+
+
   get encodedTld() {
     return this._encTld;
   },
