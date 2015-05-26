@@ -136,6 +136,42 @@ function populateUsers(docUser, menupopup) {
     }
   }
 
+
+  var ioService = Components.classes["@mozilla.org/network/io-service;1"]
+                  .getService(Components.interfaces.nsIIOService);
+  let baseTld = docUser.ownerTld;
+
+  try {
+    // Get Login Manager
+    let myLoginManager = Components.classes["@mozilla.org/login-manager;1"].
+      getService(Components.interfaces.nsILoginManager);
+
+    // Find users for the given parameters
+    let logins = myLoginManager.findLogins({}, "https://" + baseTld, "", null);
+    if (logins.length === 0) {
+      logins = myLoginManager.findLogins({}, "http://" + baseTld, "", null);
+    }
+
+    // Find user from returned array of nsILoginInfo objects
+    console.error("BW0: " + baseTld + ".length=" + logins.length);
+    for (let i = 0; i < logins.length; i++) {
+      let loginTld = getTldFromUri(ioService.newURI(logins[i].hostname, null, null));
+      console.error("Found login for " + baseTld + " of " + logins[i].username + " / " + docUser.user.plainName);
+      if (logins[i].username !== docUser.user.plainName) {
+        var usernameItem = menupopup.appendChild(doc.createElement("menuitem"));
+        usernameItem.setAttribute("type", "radio");
+        usernameItem.setAttribute("label", "* " + logins[i].username + "@" + loginTld);
+        usernameItem.setAttribute("cmd", "switch user");
+        usernameItem.setAttribute("login-user16", null);
+        usernameItem.setAttribute("login-tld", loginTld);
+      }
+    }
+  } catch(ex) {
+    // This will only happen if there is no nsILoginManager component class
+    console.error(ex);
+  }
+
+
   menupopup.appendChild(doc.createElement("menuseparator"));
 }
 
