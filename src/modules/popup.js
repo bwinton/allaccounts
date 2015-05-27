@@ -146,35 +146,26 @@ function populateUsers(docUser, menupopup) {
   let baseTld = docUser.ownerTld;
 
 
-  try {
-    // Get Login Manager
-    let myLoginManager = Components.classes["@mozilla.org/login-manager;1"].
-      getService(Components.interfaces.nsILoginManager);
+  // Find users for the given parameters
+  let logins = Services.logins.findLogins({}, "https://" + baseTld, "", null);
+  if (logins.length === 0) {
+    logins = Services.logins.findLogins({}, "http://" + baseTld, "", null);
+  }
 
-    // Find users for the given parameters
-    let logins = myLoginManager.findLogins({}, "https://" + baseTld, "", null);
-    if (logins.length === 0) {
-      logins = myLoginManager.findLogins({}, "http://" + baseTld, "", null);
+  // Find user from returned array of nsILoginInfo objects
+  for (let i = 0; i < logins.length; i++) {
+    var newAccount = docUser.user.toNewAccount();
+
+    if (!shownUsers.has(logins[i].username)) {
+      var usernameItem = menupopup.appendChild(doc.createElement("menuitem"));
+      usernameItem.setAttribute("type", "radio");
+      usernameItem.setAttribute("label", "Add " + logins[i].username + "@" + baseTld);
+      usernameItem.setAttribute("cmd", "existing account");
+      usernameItem.setAttribute("login-user16", docUser.user.toNewAccount().encodedName);
+      usernameItem.setAttribute("login-tld", docUser.user.toNewAccount().encodedTld);
+      usernameItem.existingUser = logins[i];
+      shownUsers.add(logins[i].username);
     }
-
-    // Find user from returned array of nsILoginInfo objects
-    for (let i = 0; i < logins.length; i++) {
-      var newAccount = docUser.user.toNewAccount();
-
-      if (!shownUsers.has(logins[i].username)) {
-        var usernameItem = menupopup.appendChild(doc.createElement("menuitem"));
-        usernameItem.setAttribute("type", "radio");
-        usernameItem.setAttribute("label", "Add " + logins[i].username + "@" + baseTld);
-        usernameItem.setAttribute("cmd", "existing account");
-        usernameItem.setAttribute("login-user16", docUser.user.toNewAccount().encodedName);
-        usernameItem.setAttribute("login-tld", docUser.user.toNewAccount().encodedTld);
-        usernameItem.existingUser = logins[i];
-        shownUsers.add(logins[i].username);
-      }
-    }
-  } catch(ex) {
-    // This will only happen if there is no nsILoginManager component class
-    console.error(ex);
   }
 
   menupopup.appendChild(doc.createElement("menuseparator"));

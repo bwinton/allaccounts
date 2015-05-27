@@ -178,7 +178,8 @@ var LoginDB = {
     this._reset();
 
     var all = CookieUtils.getAuthCookies();
-    setWelcomeMode(all.length === 0);
+    var saved = Services.logins.countLogins("", "", "");
+    setWelcomeMode(all.length === 0 && saved === 0);
 
     var encodedLogin;
     var encodedData; // "[youtube.com]-[user@gmail.com]-[google.com]"
