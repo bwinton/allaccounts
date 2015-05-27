@@ -167,55 +167,6 @@ function countPasswordFields(form, populatedOnly) {
   return qty;
 }
 
-function findUserNameField(doc) {
-  console.log("findUserNameField");
-  var INPUT = Ci.nsIDOMHTMLInputElement;
-  var lastTextField = null;
-
-  let forms = doc.querySelectorAll('form');
-  for (var i = 0; i < forms.length; i++) {
-    let form = forms[i];
-    var all = form.elements;
-    var elem;
-
-    for (var idx = 0, len = all.length; idx < len; idx++) {
-      elem = all[idx];
-      if ((elem instanceof INPUT) === false) {
-        continue;
-      }
-      switch (elem.type) {
-        case "text":
-        case "email":
-        case "url":
-        case "tel":
-        case "number":
-        case "password":
-          break;
-        default:
-          continue;
-      }
-      if (elem.readOnly) {
-        console.log("findUserNameField - readOnly", elem.name);
-        continue;
-      }
-      if (isElementVisible(elem) === false) {
-        // ignore empty/hidden fields
-        console.log("findUserNameField - element ignored", elem.name);
-        continue;
-      }
-      if (elem.type === "password") {
-        if (lastTextField !== null) {
-          return lastTextField;
-        }
-      } else {
-        lastTextField = elem;
-        console.log("findUserNameField - found", lastTextField);
-      }
-    }
-  };
-  return lastTextField;
-}
-
 
 function findUserName(form) {
   console.log("findUserName");

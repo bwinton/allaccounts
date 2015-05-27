@@ -161,13 +161,15 @@ var ContentRelatedEvents = {
           }
         }
         var tab = UIUtils.getLinkedTabFromBrowser(UIUtils.getParentBrowser(win));
-        let existing = tab.getAttribute('multifox-existing-login');
-        if (existing) {
-          var usernameField = findUserNameField(doc);
-          if (usernameField !== null) {
-            usernameField.value = existing;
-
+        if (tab.existingUser) {
+          let fill = function (name, value) {
+            var field = doc.querySelector("input[name='" + name + "'][placeholder]");
+            if (field) {
+              field.value = value;
+            }
           }
+          fill(tab.existingUser.usernameField, tab.existingUser.username);
+          fill(tab.existingUser.passwordField, tab.existingUser.password);
           // updateUIAsync(UIUtils.getParentBrowser(win), innerWin.isTop);
         }
 

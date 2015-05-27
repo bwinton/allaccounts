@@ -168,7 +168,7 @@ function populateUsers(docUser, menupopup) {
         usernameItem.setAttribute("cmd", "existing account");
         usernameItem.setAttribute("login-user16", docUser.user.toNewAccount().encodedName);
         usernameItem.setAttribute("login-tld", docUser.user.toNewAccount().encodedTld);
-        usernameItem.setAttribute("existing-user", logins[i].username);
+        usernameItem.existingUser = logins[i];
         shownUsers.add(logins[i].username);
       }
     }
@@ -304,7 +304,7 @@ function loginCommandCore(menuItem, newTab) {
     case "existing account":
       removeCookies(CookieUtils.getUserCookies(userId));
       removeTldData_LS(topWin.eTld);
-      loadTab(newTab, browser, topWin.eTld, userId, menuItem.getAttribute("existing-user"));
+      loadTab(newTab, browser, topWin.eTld, userId, menuItem.existingUser);
       break;
 
     case "del user":
@@ -359,7 +359,7 @@ function loadTab(newTab, browser, tldDoc, user, existing) {
     openNewTab(browser.currentURI.spec, browser.ownerDocument.defaultView);
     if (existing) {
       let tab = UIUtils.getSelectedTab(chromeWin);
-      tab.setAttribute('multifox-existing-login', existing);
+      tab.existingUser = existing;
     }
   } else {
     UserState.setTabDefaultFirstParty(tldDoc, getTabIdFromBrowser(browser), user);
