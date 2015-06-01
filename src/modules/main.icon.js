@@ -57,13 +57,6 @@ function updateUIAsyncCore(tab) {
 
 try {
   var topInnerId = getCurrentTopInnerId(tab);
-  if (UserState.hasUsers(topInnerId) === false) {
-    if (m_welcomeMode === false) {
-      hideUI(tab.ownerDocument, false);
-      return;
-    }
-  }
-
   // show button
   var doc = tab.ownerDocument;
   var container = getIconContainer(doc);

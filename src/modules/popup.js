@@ -55,10 +55,12 @@ function createLoginsMenu(menupopup) {
 
   // list all accounts
   var docUser = "docUserObj" in topInnerData ? topInnerData.docUserObj : null;
+  var shownUsers = new Set();
   if (docUser !== null) {
-    populateUsers(docUser, menupopup);
-    populateNewAccount(docUser, menupopup);
+    shownUsers = populateUsers(docUser, menupopup);
   }
+  populateLogins(shownUsers, menupopup);
+  populateNewAccount(docUser, menupopup);
 
   // list 3rd-party users
   if ("thirdPartyUsers" in topInnerData) {
@@ -81,6 +83,12 @@ function onHideLoginsMenu(evt) {
 
 
 function populateNewAccount(docUser, menupopup) {
+  var doc = menupopup.ownerDocument;
+  menupopup.appendChild(doc.createElement("menuseparator"));
+  if (docUser === null) {
+    docUser = {user: new UserId(UserUtils.NewAccount, "")};
+  }
+
   var newAccount = menupopup.appendChild(menupopup.ownerDocument.createElement("menuitem"));
   newAccount.setAttribute("label", util.getText("icon.user.new.label"));
   newAccount.setAttribute("accesskey", util.getText("icon.user.new.accesskey"));
@@ -139,12 +147,23 @@ function populateUsers(docUser, menupopup) {
       shownUsers.add(myUser.plainName);
     }
   }
+  return shownUsers;
+}
 
+function populateLogins(shownUsers, menupopup) {
 
-  var ioService = Components.classes["@mozilla.org/network/io-service;1"]
-                  .getService(Components.interfaces.nsIIOService);
-  let baseTld = docUser.ownerTld;
-
+  var doc = menupopup.ownerDocument;
+  let uri = UIUtils.getSelectedTab(menupopup.ownerDocument.defaultView).linkedBrowser.documentURI;
+  if (uri.spec) {
+    uri = uri.spec;
+  }
+  let firstSlash = uri.indexOf('/', 8);
+  if (firstSlash != -1) {
+    uri = uri.slice(0, firstSlash);
+  }
+  let hostname = uri;
+  console.log(hostname);
+  let baseTld = getTldFromUri(Services.io.newURI(uri, null, null));
 
   // Find users for the given parameters
   let logins = Services.logins.findLogins({}, "https://" + baseTld, "", null);
@@ -154,21 +173,19 @@ function populateUsers(docUser, menupopup) {
 
   // Find user from returned array of nsILoginInfo objects
   for (let i = 0; i < logins.length; i++) {
-    var newAccount = docUser.user.toNewAccount();
-
     if (!shownUsers.has(logins[i].username)) {
+      var newAccount = new UserId(logins[i].username, baseTld);
+
       var usernameItem = menupopup.appendChild(doc.createElement("menuitem"));
       usernameItem.setAttribute("type", "radio");
       usernameItem.setAttribute("label", "Add " + logins[i].username + "@" + baseTld);
       usernameItem.setAttribute("cmd", "existing account");
-      usernameItem.setAttribute("login-user16", docUser.user.toNewAccount().encodedName);
-      usernameItem.setAttribute("login-tld", docUser.user.toNewAccount().encodedTld);
+      usernameItem.setAttribute("login-user16", newAccount.encodedName);
+      usernameItem.setAttribute("login-tld", newAccount.encodedTld);
       usernameItem.existingUser = logins[i];
       shownUsers.add(logins[i].username);
     }
   }
-
-  menupopup.appendChild(doc.createElement("menuseparator"));
 }
 
 
